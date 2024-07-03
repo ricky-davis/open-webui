@@ -36,6 +36,7 @@
 	import RateComment from './RateComment.svelte';
 	import CitationsModal from '$lib/components/chat/Messages/CitationsModal.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
+	import Checkmark from '$lib/components/common/Checkmark.svelte';
 	import WebSearchResults from './ResponseMessage/WebSearchResults.svelte';
 
 	export let message;
@@ -101,6 +102,27 @@
 	$: if (message) {
 		renderStyling();
 	}
+
+	let modifiedStatusHistory = [];
+	$: if (message?.statusHistory) {
+		modifiedStatusHistory = message.statusHistory.map((status, index, array) => {
+			// Clone the status object to avoid mutating the original message.statusHistory
+			let modifiedStatus = {...status};
+
+			// Check if the status is marked as not done and it's not the last item in the array
+			if (!modifiedStatus.done && index !== array.length - 1) {
+				// Mark all but the most recent done status as done
+				modifiedStatus.done = true;
+			}
+
+			return modifiedStatus;
+		});
+	} else if (message?.status) {
+		modifiedStatusHistory = [message.status];
+	} else {
+		modifiedStatusHistory = [];
+	}
+	
 
 	const renderStyling = async () => {
 		await tick();
@@ -424,32 +446,33 @@
 				class="prose chat-{message.role} w-full max-w-full dark:prose-invert prose-headings:my-0 prose-headings:-mb-4 prose-p:m-0 prose-p:-mb-6 prose-pre:my-0 prose-table:my-0 prose-blockquote:my-0 prose-img:my-0 prose-ul:-my-4 prose-ol:-my-4 prose-li:-my-3 prose-ul:-mb-6 prose-ol:-mb-8 prose-ol:p-0 prose-li:-mb-4 whitespace-pre-line"
 			>
 				<div>
-					{#if (message?.statusHistory ?? [...(message?.status ? [message?.status] : [])]).length > 0}
-						{@const status = (
-							message?.statusHistory ?? [...(message?.status ? [message?.status] : [])]
-						).at(-1)}
-						<div class="flex items-center gap-2 pt-1 pb-1">
-							{#if status.done === false}
-								<div class="">
-									<Spinner className="size-4" />
-								</div>
-							{/if}
-
-							{#if status?.action === 'web_search' && status?.urls}
-								<WebSearchResults {status}>
-									<div class="flex flex-col justify-center -space-y-0.5">
-										<div class="text-base line-clamp-1 text-wrap">
-											{status?.description}
+					{#if modifiedStatusHistory.length > 0}
+						<div class="">
+							{#each modifiedStatusHistory as status}
+								<div class="flex items-center gap-2">
+									{#if status.done}
+										<Checkmark className="size-4" color="#16a34a" />
+									{:else}
+										<Spinner className="size-4" />
+									{/if}
+							
+									{#if status?.action === 'web_search' && status?.urls}
+										<WebSearchResults {status}>
+											<div class="flex flex-col justify-center -space-y-0.5">
+												<div class="text-base line-clamp-1 text-wrap">
+													{status?.description}
+												</div>
+											</div>
+										</WebSearchResults>
+									{:else}
+										<div class="flex flex-col justify-center -space-y-0.5">
+											<div class="text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap">
+												{status?.description}
+											</div>
 										</div>
-									</div>
-								</WebSearchResults>
-							{:else}
-								<div class="flex flex-col justify-center -space-y-0.5">
-									<div class=" text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap">
-										{status?.description}
-									</div>
+									{/if}
 								</div>
-							{/if}
+							{/each}
 						</div>
 					{/if}
 

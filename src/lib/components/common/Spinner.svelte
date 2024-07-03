@@ -1,9 +1,10 @@
 <script lang="ts">
 	export let className: string = 'size-5';
+    export let color: string = 'currentColor';
 </script>
 
-<div class="flex justify-center text-center">
-	<svg class={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+<div class="flex justify-center text-center self-start pt-1">
+	<svg class={className} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg"
 		><style>
 			.spinner_ajPY {
 				transform-origin: center;
