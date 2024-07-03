@@ -107,7 +107,7 @@
 	$: if (message?.statusHistory) {
 		modifiedStatusHistory = message.statusHistory.map((status, index, array) => {
 			// Clone the status object to avoid mutating the original message.statusHistory
-			let modifiedStatus = {...status};
+			let modifiedStatus = { ...status };
 
 			// Check if the status is marked as not done and it's not the last item in the array
 			if (!modifiedStatus.done && index !== array.length - 1) {
@@ -122,7 +122,6 @@
 	} else {
 		modifiedStatusHistory = [];
 	}
-	
 
 	const renderStyling = async () => {
 		await tick();
@@ -455,7 +454,7 @@
 									{:else}
 										<Spinner className="size-4" />
 									{/if}
-							
+
 									{#if status?.action === 'web_search' && status?.urls}
 										<WebSearchResults {status}>
 											<div class="flex flex-col justify-center -space-y-0.5">
@@ -466,7 +465,9 @@
 										</WebSearchResults>
 									{:else}
 										<div class="flex flex-col justify-center -space-y-0.5">
-											<div class="text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap">
+											<div
+												class="text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap"
+											>
 												{status?.description}
 											</div>
 										</div>
